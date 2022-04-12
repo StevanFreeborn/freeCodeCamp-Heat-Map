@@ -57,6 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .scale(yScale)
         .tickValues(yScale.domain())
         .tickFormat((month) => {
+            // each month tick value will be formatted
+            // as a date object displaying only the
+            // abbreviated month.
             let date = new Date(0);
             date.setUTCMonth(month);
             let format = d3.timeFormat("%b");
