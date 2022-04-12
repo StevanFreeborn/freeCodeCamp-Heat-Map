@@ -72,7 +72,41 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("id", "y-axis")
         .attr("transform", "translate(70,50)")
         .call(yAxis);
+        
+        // create colors object 
+        const colors = [
+            {
+                color: "#d72f27",
+            },
+            {
+                color: "#f46d43",
+            },
+            {
+                color: "#fdae61",
+            },
+            {
+                color: "#fee090",
+            },
+            {
+                color: "#ffffbf",
+            },
+            {
+                color: "#e0f3f8",
+            },
+            {
+                color: "#abd9e9",
+            },
+        ];
 
+        // calculate and add step values to each color
+        const temps = data.monthlyVariance.map(d => d.variance + data.baseTemperature);
+        const maxTemp = Math.max(...temps);
+        const minTemp = Math.min(...temps);
+
+        const step = (maxTemp - minTemp)/colors.length;
+
+        colors.forEach((color,i) => color.step = maxTemp - (step * i))
+        
         // add cells
         svg.selectAll("rect")
         .data(data.monthlyVariance)
@@ -85,6 +119,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("class", "cell")
         .attr("data-month", d => d.month - 1)
         .attr("data-year", d=> d.year)
-        .attr("data-temp", d => d.variance + data.baseTemperature);
+        .attr("data-temp", d => d.variance + data.baseTemperature)
+        .attr("fill", d => {
+            let temp = d.variance + data.baseTemperature;
+            for(i = 0; i < colors.length; i++)
+                if(temp > colors[i].step) 
+                    return colors[i].color;
+        });
     }
 })
