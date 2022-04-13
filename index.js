@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .on("mouseover", (event, d) => {
             // format tooltip data
-            let date = d3.timeFormat("%b %Y")(new Date(d.year, d.month));
+            let date = d3.timeFormat("%b %Y")(new Date(d.year, d.month - 1));
             let temp = d3.format(".2f")(data.baseTemperature + d.variance);
             let vari = d3.format(".2f")(d.variance);
             
