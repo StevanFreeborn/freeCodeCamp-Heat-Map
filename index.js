@@ -88,10 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // create colors object 
         const colors = [
             {
-                color: "#e0f3f8",
+                color: "#abd9e9",
             },
             {
-                color: "#abd9e9",
+                color: "#e0f3f8",
             },
             {
                 color: "#ffffbf",
