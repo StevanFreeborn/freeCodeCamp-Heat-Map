@@ -6,3 +6,8 @@
     width: 100vw;
     height: 100vh;
 }
+
+rect:hover {
+    stroke-width: 2;
+    stroke: black;
+}
