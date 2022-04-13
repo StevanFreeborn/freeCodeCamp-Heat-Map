@@ -8,15 +8,27 @@ document.addEventListener("DOMContentLoaded", () => {
     request.onload = () => {
 
         const data = JSON.parse(request.responseText);
-        console.log(data);
+        
+        d3.select(".description")
+        .append("h5")
+        .html(`${data.monthlyVariance[0].year} - ${data.monthlyVariance[data.monthlyVariance.length-1].year}: Base Temperature ${data.baseTemperature}&#8451;`);
 
         const width = 800;
         const height = 400;
 
+        // initialize tooltip
+        let tip = d3.tip()
+        .attr("class", "text-center")
+        .attr("class", "card py-2 px-4")
+        .attr("id", "tooltip")
+        .offset([-10,0]);
+
+        // add svg
         const svg = d3.select(".heat-map")
         .append("svg")
         .attr("id", "heat-map")
-        .attr("viewBox", `0 0 ${width + 140} ${height + 100}`);
+        .attr("viewBox", `0 0 ${width + 140} ${height + 100}`)
+        .call(tip);
 
         // build xaxis
         const xScale = d3.scaleBand()
@@ -107,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         colors.forEach((color,i) => color.step = maxTemp - (step * i))
         
-        // add cells
+        // add cells and populate tooltip
         svg.selectAll("rect")
         .data(data.monthlyVariance)
         .enter()
@@ -125,6 +137,16 @@ document.addEventListener("DOMContentLoaded", () => {
             for(i = 0; i < colors.length; i++)
                 if(temp > colors[i].step) 
                     return colors[i].color;
-        });
+        })
+        .on("mouseover", (event, d) => {
+            let date = d3.timeFormat("%b %Y")(new Date(d.year, d.month));
+            let temp = d3.format(".2f")(data.baseTemperature + d.variance);
+            let vari = d3.format(".2f")(d.variance);
+            
+            tip.attr("data-year", d.year);
+            tip.html(`${date}<br>${temp}&#8451;<br>${vari}&#8451;`);
+            tip.show(event);
+        })
+        .on("mouseout", tip.hide);
     }
 })
