@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const svg = d3.select(".heat-map")
         .append("svg")
         .attr("id", "heat-map")
-        .attr("viewBox", `0 0 ${width + 140} ${height + 100}`)
+        .attr("viewBox", `0 0 ${width + 140} ${height + 200}`)
         .call(tip);
 
         // build xaxis
@@ -88,37 +88,37 @@ document.addEventListener("DOMContentLoaded", () => {
         // create colors object 
         const colors = [
             {
-                color: "#d72f27",
+                color: "#e0f3f8",
             },
             {
-                color: "#f46d43",
-            },
-            {
-                color: "#fdae61",
-            },
-            {
-                color: "#fee090",
+                color: "#abd9e9",
             },
             {
                 color: "#ffffbf",
             },
             {
-                color: "#e0f3f8",
+                color: "#fee090",
             },
             {
-                color: "#abd9e9",
+                color: "#fdae61",
+            },
+            {
+                color: "#f46d43",
+            },
+            {
+                color: "#d72f27",
             },
         ];
 
         // calculate and add step values to each color
         const temps = data.monthlyVariance.map(d => d.variance + data.baseTemperature);
         const maxTemp = Math.max(...temps);
-        const minTemp = Math.min(...temps);
+        const minTemp = Math.min(...temps) - 0.25;
 
         const step = (maxTemp - minTemp)/colors.length;
 
-        colors.forEach((color,i) => color.step = maxTemp - (step * i))
-        
+        colors.forEach((color,i) => color.step = minTemp + (step * i))
+        console.log(colors);
         // add cells and populate tooltip
         svg.selectAll("rect")
         .data(data.monthlyVariance)
@@ -134,19 +134,59 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("data-temp", d => d.variance + data.baseTemperature)
         .attr("fill", d => {
             let temp = d.variance + data.baseTemperature;
-            for(i = 0; i < colors.length; i++)
+            for(i = colors.length - 1; i >= 0; i--)
                 if(temp > colors[i].step) 
                     return colors[i].color;
         })
         .on("mouseover", (event, d) => {
+            // format tooltip data
             let date = d3.timeFormat("%b %Y")(new Date(d.year, d.month));
             let temp = d3.format(".2f")(data.baseTemperature + d.variance);
             let vari = d3.format(".2f")(d.variance);
             
+            // add attribute to tooltip
+            // populate tooltip content
             tip.attr("data-year", d.year);
             tip.html(`${date}<br>${temp}&#8451;<br>${vari}&#8451;`);
             tip.show(event);
         })
         .on("mouseout", tip.hide);
+
+        // add legend
+        const legendWidth = 400;
+        const legendHeight = 300 / colors.length;
+
+        const legendScale = d3.scaleLinear()
+        .domain([minTemp, maxTemp])
+        .range([0, legendWidth]);
+
+        const steps = colors.map(color => color.step)
+
+        const legendAxis = d3.axisBottom()
+        .scale(legendScale)
+        .tickSize(10,0)
+        .tickValues([...steps,maxTemp])
+        .tickFormat(d3.format(".2f"));
+
+        const legend = svg.append("g")
+        .attr("id", "legend")
+        .attr("transform", "translate(273,500)");
+
+        legend.append("g")
+        .selectAll("rect")
+        .data(colors)
+        .enter()
+        .append("rect")
+        .attr("x", d => legendScale(d.step))
+        .attr("y", 0)
+        .attr("width", legendWidth/colors.length)
+        .attr("height", legendHeight)
+        .attr("fill", d => d.color);
+
+        legend.append("g")
+        .attr("transform", `translate(0,${legendHeight})`)
+        .call(legendAxis);
+
+        console.log(minTemp, maxTemp);
     }
 })
