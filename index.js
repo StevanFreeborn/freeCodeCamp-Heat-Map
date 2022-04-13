@@ -115,10 +115,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const maxTemp = Math.max(...temps);
         const minTemp = Math.min(...temps) - 0.25;
 
+        // calculate step value for equal # of steps
+        // in range
         const step = (maxTemp - minTemp)/colors.length;
 
+        // set each color's step value
         colors.forEach((color,i) => color.step = minTemp + (step * i))
-        console.log(colors);
+
         // add cells and populate tooltip
         svg.selectAll("rect")
         .data(data.monthlyVariance)
@@ -152,26 +155,35 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .on("mouseout", tip.hide);
 
-        // add legend
+        // legend size
         const legendWidth = 400;
         const legendHeight = 300 / colors.length;
 
+        // legend scale
         const legendScale = d3.scaleLinear()
         .domain([minTemp, maxTemp])
         .range([0, legendWidth]);
 
+        // array of step values
+        // for use as tick values
         const steps = colors.map(color => color.step)
 
+        // create legend axis using scale
+        // using step values + maxtemp for tick values
         const legendAxis = d3.axisBottom()
         .scale(legendScale)
         .tickSize(10,0)
         .tickValues([...steps,maxTemp])
         .tickFormat(d3.format(".2f"));
 
+        // add legend to svg
         const legend = svg.append("g")
         .attr("id", "legend")
         .attr("transform", "translate(273,500)");
 
+        // add legend rects
+        // width is as long as each step
+        // tooltip to display color
         legend.append("g")
         .selectAll("rect")
         .data(colors)
@@ -188,10 +200,9 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .on("mouseout", tip.hide);
 
+        // add legend axis
         legend.append("g")
         .attr("transform", `translate(0,${legendHeight})`)
         .call(legendAxis);
-
-        console.log(minTemp, maxTemp);
     }
 })
