@@ -181,7 +181,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", 0)
         .attr("width", legendWidth/colors.length)
         .attr("height", legendHeight)
-        .attr("fill", d => d.color);
+        .attr("fill", d => d.color)
+        .on("mouseover", (event,d,i) => {
+            tip.html(`${d.color}`)
+            tip.show(event);
+        })
+        .on("mouseout", tip.hide);
 
         legend.append("g")
         .attr("transform", `translate(0,${legendHeight})`)
