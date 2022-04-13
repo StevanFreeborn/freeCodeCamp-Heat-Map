@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .data(data.monthlyVariance)
         .enter()
         .append("rect")
-        .attr("x", d => xScale(d.year) + 70)
+        .attr("x", d => xScale(d.year) + 71)
         .attr("y", d => yScale(d.month) + 50)
         .attr("width", d => xScale.bandwidth(d.year))
         .attr("height", d => yScale.bandwidth(d.month))
